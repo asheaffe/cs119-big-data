@@ -23,6 +23,10 @@ def accum(x):
     global counter
     counter.add(x)  
 
+rdd.foreach(accum)
+
+print(counter.value)
+
 # Error messages ensue
 # 24/10/18 12:47:09 ERROR Executor: Exception in task 4.0 in stage 3.0 (TID 28)
 # org.apache.spark.api.python.PythonException: Traceback (most recent call last):
