@@ -5,6 +5,7 @@ sc = SparkContext(conf=conf)
 
 data = [1,2,3,4,5]
 counter = 0
+count = sc.parallelize(counter)
 rdd = sc.parallelize(data)
 
 def print_ (x):
