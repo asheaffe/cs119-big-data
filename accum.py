@@ -4,7 +4,7 @@ conf = SparkConf().setAppName('appName').setMaster('local')
 sc = SparkContext(conf=conf)
 
 data = [1,2,3,4,5]
-counter = 0
+counter = sc.accumulator(0)   # set counter to be an accumulator
 rdd = sc.parallelize(data)
 
 def print_ (x):
@@ -18,12 +18,10 @@ rdd.foreach(print_)
 # 2
 # 1
 
-def accum(x):                                                               
-    counter += x
-
-total = rdd.map(accum)
-
-print(total)
+def accum(x):   
+    # use the global counter and use accumulator add() method
+    global counter
+    counter.add(x)  
 
 # Error messages ensue
 # 24/10/18 12:47:09 ERROR Executor: Exception in task 4.0 in stage 3.0 (TID 28)
