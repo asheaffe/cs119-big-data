@@ -5,7 +5,6 @@ sc = SparkContext(conf=conf)
 
 data = [1,2,3,4,5]
 counter = 0
-count = sc.parallelize(counter)
 rdd = sc.parallelize(data)
 
 def print_ (x):
@@ -22,7 +21,7 @@ rdd.foreach(print_)
 def accum(x):                                                               
     counter += x
 
-rdd.foreach(accum)
+rdd.map(accum)
 
 # Error messages ensue
 # 24/10/18 12:47:09 ERROR Executor: Exception in task 4.0 in stage 3.0 (TID 28)
