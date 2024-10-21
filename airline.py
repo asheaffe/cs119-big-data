@@ -1,13 +1,18 @@
 from pyspark import SparkContext
 from pyspark.streaming import StreamingContext
 
-spark = SparkContext(appName="Airline Data")
+sc = SparkContext(appName="Airline Data")
 
 file_path_june = "data\ontime.td.202406.asc"
 file_path_july = "data\ontime.td.202407.asc"
 
 # get data
-df = spark.read.csv(file_path_june, header=True, inferSchema=True)
+df = sc.textFile(file_path_june)
+print(type(df))     # can I just append the second datafile to the first?
+
+df2 = sc.textfile(file_path_july)
 
 # sanity check
-df.show(5)
+five = df.take(5)
+for line in five:
+    print(line)
