@@ -13,6 +13,4 @@ print(type(df))     # can I just append the second datafile to the first?
 df2 = sc.textFile(file_path_july)
 
 # sanity check
-five = df.take(5)
-for line in five:
-    print(line)
+df.show(5)
