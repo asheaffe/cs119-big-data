@@ -1,6 +1,7 @@
-from pyspark import SparkSession
+from pyspark import SparkContext
+from pyspark.streaming import StreamingContext
 
-spark = SparkSession.builder.appName("Airline Data Processing").getOrCreate()
+spark = SparkContext(appName="Airline Data")
 
 file_path_june = "data\ontime.td.202406.asc"
 file_path_july = "data\ontime.td.202407.asc"
