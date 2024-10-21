@@ -3,8 +3,8 @@ from pyspark.streaming import StreamingContext
 
 sc = SparkContext(appName="Airline Data")
 
-file_path_june = "data\ontime.td.202406.asc"
-file_path_july = "data\ontime.td.202407.asc"
+file_path_june = "data/ontime.td.202406.asc"
+file_path_july = "data/ontime.td.202407.asc"
 
 # get data
 df = sc.textFile(file_path_june)
