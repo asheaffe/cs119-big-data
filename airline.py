@@ -10,7 +10,7 @@ file_path_july = "data\ontime.td.202407.asc"
 df = sc.textFile(file_path_june)
 print(type(df))     # can I just append the second datafile to the first?
 
-df2 = sc.textfile(file_path_july)
+df2 = sc.textFile(file_path_july)
 
 # sanity check
 five = df.take(5)
