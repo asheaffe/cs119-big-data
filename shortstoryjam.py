@@ -73,4 +73,5 @@ for tagged in all_tagged[0]:
         else:
             parts_o_speech[key] = [tagged[0]]
 
-print(parts_o_speech)
+for key in parts_o_speech:
+    print(key, ": ", parts_o_speech[key])
