@@ -4,10 +4,12 @@ import string
 import os
 import nltk
 from nltk.tokenize import sent_tokenize, word_tokenize
+from nltk.data import load
 nltk.download('punkt_tab')
 nltk.download('punkt')
 nltk.download('averaged_perceptron_tagger')
 nltk.download('averaged_perceptron_tagger_eng')
+nltk.download('tagsets')
 stopwords_list = requests.get("https://gist.githubusercontent.com/rg089/35e00abf8941d72d419224cfd5b5925d/raw/12d899b70156fd0041fa9778d657330b024b959c/stopwords.txt").content
 stopwords = list(set(stopwords_list.decode().splitlines()))
 
@@ -55,4 +57,20 @@ sent_text = nltk.sent_tokenize(paragraph) # this gives us a list of sentences
 # now loop over each sentence and tokenize it separately
 all_tagged = [nltk.pos_tag(nltk.word_tokenize(sent)) for sent in sent_text]
 
-print(all_tagged)
+tagdict = load('help/tagsets/upenn_tagset.pickle')
+
+taglist = list(tagdict.keys())
+
+print(all_tagged[0])
+parts_o_speech = {}
+# go through all tagged elements in story
+for tagged in all_tagged[0]:
+    key = tagged[1]
+    print(key)
+    if key in taglist:
+        if key in parts_o_speech:
+            parts_o_speech[key].append(tagged[0])
+        else:
+            parts_o_speech[key] = [tagged[0]]
+
+print(parts_o_speech)
