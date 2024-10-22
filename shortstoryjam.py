@@ -5,6 +5,13 @@ import os
 import nltk
 from nltk.tokenize import sent_tokenize, word_tokenize
 from nltk.data import load
+
+from pyspark import SparkConf, SparkContext
+from pyspark.sql import SparkSession
+from pyspark.sql import functions as F
+from pyspark.sql.functions import udf, col
+from pyspark.sql.types import StructType, StructField, StringType, IntegerType, FloatType, ArrayType
+from pyspark.streaming import StreamingContext
 nltk.download('punkt_tab')
 nltk.download('punkt')
 nltk.download('averaged_perceptron_tagger')
@@ -61,17 +68,46 @@ tagdict = load('help/tagsets/upenn_tagset.pickle')
 
 taglist = list(tagdict.keys())
 
-print(all_tagged[0])
 parts_o_speech = {}
 # go through all tagged elements in story
 for tagged in all_tagged[0]:
     key = tagged[1]
-    print(key)
     if key in taglist:
         if key in parts_o_speech:
             parts_o_speech[key].append(tagged[0])
         else:
             parts_o_speech[key] = [tagged[0]]
 
-for key in parts_o_speech:
-    print(key, ": ", parts_o_speech[key])
+# create a list of dictionaries with each part of speech
+pos_dict = []
+
+# restructuring the dict for the dataframe
+for key, value in parts_o_speech.items():  
+    if key.startswith('N'): 
+        for item in value: 
+            pos_dict.append({'Noun': item})
+    elif key.startswith('VB'):  
+        for item in value: 
+            pos_dict.append({'Verb': item})
+    elif key.startswith('JJ'):  
+        for item in value: 
+            pos_dict.append({'Adjective': item})
+    elif key.startswith('RB'):  
+        for item in value: 
+            pos_dict.append({'Adverb': item})
+
+print(pos_dict)
+
+# create a dataframe for parts of speech
+spark = SparkSession.builder.getOrCreate()
+
+# set schema
+schema = StructType([
+    StructField("Noun", StringType(), True),
+    StructField("Verb", StringType(), True),
+    StructField("Adjective", StringType(), True),
+    StructField("Adverb", StringType(), True)
+])
+
+df = spark.createDataFrame(pos_dict, schema=schema)
+df.show()
