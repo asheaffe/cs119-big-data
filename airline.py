@@ -150,15 +150,25 @@ df = df.replace(airport_dict, subset=["arrival_airport"])
 # airport_delays = airport_delays.orderBy(col("delay").asc())
 # airport_delays.show()
 
-arrival_df = df.alias("arrival_df")
-depart_df = df.alias("depart_df")
+# arrival_df = df.alias("arrival_df")
+# depart_df = df.alias("depart_df")
 
-# Perform the join
-df_joined = arrival_df.join(depart_df, arrival_df["arrival_airport"] == depart_df["depart_airport"], "inner").alias("airport")
+# # Perform the join
+# df_joined = arrival_df.join(depart_df, arrival_df["arrival_airport"] == depart_df["depart_airport"], "inner").alias("airport")
 
-# Show the result
-df_joined.show()
+# # Show the result
+# df_joined.show()
 
-airport_count = df.groupBy("depart_airport").agg(F.count("depart_airport").alias("count"))
-airport_count = airport_count.orderBy(col("count").desc())
+# airport_counts = df.groupBy().agg(
+#     F.count("depart_airport").alias("depart_count"),
+#     F.count("arrival_airport").alias("arrival_count")
+# )
+
+airport_counts = df.groupBy("depart_airport", "arrival_airport").agg(
+    F.count("depart_airport").alias("depart_count"),
+    F.count("arrival_airport").alias("arrival_count")
+)
+
+airport_count = airport_counts.withColumn("total", F.col("depart_count") + F.col("arrival_count"))
+airport_count = airport_count.orderBy(col("total").desc())
 airport_count.show(5)
