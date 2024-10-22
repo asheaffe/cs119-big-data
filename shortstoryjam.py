@@ -58,51 +58,68 @@ content['A_DESCENT_INTO_THE_MAELSTROM'] = clean_text(content['A_DESCENT_INTO_THE
 # with open(story_path, 'r') as file:
 #             paragraph = file.read()
 
-paragraph = clean_text(content['A_DESCENT_INTO_THE_MAELSTROM'])
+# method for extracting parts of speech from a particular story
+def parts_of_speech(story, content):
+    paragraph = clean_text(content[story])
 
-sent_text = nltk.sent_tokenize(paragraph) # this gives us a list of sentences
-# now loop over each sentence and tokenize it separately
-all_tagged = [nltk.pos_tag(nltk.word_tokenize(sent)) for sent in sent_text]
+    sent_text = nltk.sent_tokenize(paragraph) # this gives us a list of sentences
+    # now loop over each sentence and tokenize it separately
+    all_tagged = [nltk.pos_tag(nltk.word_tokenize(sent)) for sent in sent_text]
 
-tagdict = load('help/tagsets/upenn_tagset.pickle')
+    tagdict = load('help/tagsets/upenn_tagset.pickle')
 
-taglist = list(tagdict.keys())
+    taglist = list(tagdict.keys())
 
-parts_o_speech = {}
-# go through all tagged elements in story
-for tagged in all_tagged[0]:
-    key = tagged[1]
-    if key in taglist:
-        if key in parts_o_speech:
-            parts_o_speech[key].append(tagged[0])
-        else:
-            parts_o_speech[key] = [tagged[0]]
+    parts_o_speech = {}
+    # go through all tagged elements in story
+    for tagged in all_tagged[0]:
+        key = tagged[1]
+        if key in taglist:
+            if key in parts_o_speech:
+                parts_o_speech[key].append(tagged[0])
+            else:
+                parts_o_speech[key] = [tagged[0]]
 
-# create a list of dictionaries with each part of speech
+    return parts_o_speech
+
+# create a list of dictionaries for each story
 pos_dict = []
 
-# restructuring the dict for the dataframe
-for key, value in parts_o_speech.items():  
-    if key.startswith('N'): 
-        for item in value: 
-            pos_dict.append({'Noun': item})
-    elif key.startswith('VB'):  
-        for item in value: 
-            pos_dict.append({'Verb': item})
-    elif key.startswith('JJ'):  
-        for item in value: 
-            pos_dict.append({'Adjective': item})
-    elif key.startswith('RB'):  
-        for item in value: 
-            pos_dict.append({'Adverb': item})
+temp = {}
+print(content)
+# add each story and data to dictionary
+for story in content:
+    pos = parts_of_speech(story, content)
 
-print(pos_dict)
+    temp['text'] = content[story]
+    temp['Noun'] = []
+    temp['Verb'] = []
+    temp['Adjective'] = []
+    temp['Adverb'] = []
+
+    for key, value in pos.items():  
+        if key.startswith('N'): 
+            for item in value: 
+                temp['Noun'].append(item)
+        elif key.startswith('VB'):  
+            for item in value: 
+                temp['Verb'].append(item)
+        elif key.startswith('JJ'):  
+            for item in value: 
+                temp['Adjective'].append(item)
+        elif key.startswith('RB'):  
+            for item in value: 
+                temp['Adverb'].append(item)
+
+    pos_dict.append(temp)
+    temp = {}
 
 # create a dataframe for parts of speech
 spark = SparkSession.builder.getOrCreate()
 
 # set schema
 schema = StructType([
+    StructField("text", StringType(), True),
     StructField("Noun", StringType(), True),
     StructField("Verb", StringType(), True),
     StructField("Adjective", StringType(), True),
@@ -110,4 +127,11 @@ schema = StructType([
 ])
 
 df = spark.createDataFrame(pos_dict, schema=schema)
+
+# # only show the full rows for demonstration
+# df = df.select(
+#     "Noun", "Verb", "Adjective", "Adverb"
+# ).where(
+#     (df.Noun.isNotNull()) & (df.Verb.isNotNull()) & (df.Adjective.isNotNull()) & (df.Adverb.isNotNull())
+# )
 df.show()
