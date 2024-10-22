@@ -30,7 +30,21 @@ def clean_text(text):
 
 no_stopwords = remove_stopwords(content)
 
-
 content = clean_text(content)
 
-print(content)
+
+## Q2: NLTK
+import nltk
+nltk.download('punkt')
+nltk.download('averaged_perceptron_tagger')
+from nltk.tokenize import sent_tokenize, word_tokenize
+
+# getting the text from the first story (A_DESCENT_INTO...)
+story_path = "data/poe-stories/A_DESCENT_INTO_THE_MAELSTROM"
+
+with open(story_path, 'r') as file:
+            paragraph = file.read()
+
+sent_text = nltk.sent_tokenize(paragraph) # this gives us a list of sentences
+# now loop over each sentence and tokenize it separately
+all_tagged = [nltk.pos_tag(nltk.word_tokenize(sent)) for sent in sent_text]
