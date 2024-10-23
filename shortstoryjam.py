@@ -86,7 +86,6 @@ def parts_of_speech(story, content):
 pos_dict = []
 
 temp = {}
-print(content)
 # add each story and data to dictionary
 for story in content:
     pos = parts_of_speech(story, content)
@@ -120,18 +119,18 @@ spark = SparkSession.builder.getOrCreate()
 # set schema
 schema = StructType([
     StructField("text", StringType(), True),
-    StructField("Noun", StringType(), True),
-    StructField("Verb", StringType(), True),
-    StructField("Adjective", StringType(), True),
-    StructField("Adverb", StringType(), True)
+    StructField("Noun", ArrayType(StringType()), True),
+    StructField("Verb", ArrayType(StringType()), True),
+    StructField("Adjective", ArrayType(StringType()), True),
+    StructField("Adverb", ArrayType(StringType()), True)
 ])
 
 df = spark.createDataFrame(pos_dict, schema=schema)
 
-# # only show the full rows for demonstration
-# df = df.select(
-#     "Noun", "Verb", "Adjective", "Adverb"
-# ).where(
-#     (df.Noun.isNotNull()) & (df.Verb.isNotNull()) & (df.Adjective.isNotNull()) & (df.Adverb.isNotNull())
-# )
+
+df = df.withColumn("Noun_Count", F.size(df['Noun']))
+df = df.withColumn("Verb_Count", F.size(df['Verb']))
+df = df.withColumn("Adjective_Count", F.size(df['Adjective']))
+df = df.withColumn("Adverb_Count", F.size(df['Adverb']))
+df = df.select("Noun_Count", 'Verb_Count', "Adjective_Count", "Adverb_Count")
 df.show()
