@@ -23,3 +23,10 @@ class BloomFilter:
             if self.bit_array[hash_value] == 0:
                 return False
         return True
+    
+    def to_bytes(self):
+        # convert from bits to bytes
+        bit_str = ''.join(str(bit) for bit in self.bit_array)
+
+        byte_array = int(bit_str, 2).to_bytes((len(bit_str) + 7) // 8, byteorder='big')
+        return byte_array
