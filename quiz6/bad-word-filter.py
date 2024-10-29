@@ -33,3 +33,27 @@ for word in bad_words:
 
 # broadcast the filter
 broadcast = sc.broadcast(bloom_filter)
+
+# method for piping sentences and checking if it is clean
+def clean_sentence(sentence):
+    # returns clean version of sentence
+    words = sentence.split()
+    return all(word not in bloom_filter for word in words)
+
+# dataframe that reads from the socket stream
+lines = spark.readStream \
+        .format("socket") \
+        .option("host", "localhost") \
+        .option("port", 9999) \
+        .load()
+
+clean_sentences = lines.rdd.map(lambda row: row.value) \
+    .filter(clean_sentence)
+
+# write clean sentence to console
+query = clean_sentences.writeStream \
+    .outputMode("append") \
+    .format("console") \
+    .start()
+
+query.awaitTermination()
