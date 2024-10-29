@@ -38,9 +38,11 @@ broadcast = sc.broadcast(bloom_filter)
 
 # method for piping sentences and checking if it is clean
 def clean_sentence(sentence):
+    blm = broadcast.value
+
     # returns clean version of sentence
     words = sentence.split()
-    return all(word not in bloom_filter for word in words)
+    return all(word not in blm for word in words)
 
 clean_udf = udf(clean_sentence, BooleanType())
 
