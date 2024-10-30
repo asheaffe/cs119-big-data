@@ -53,9 +53,16 @@ lines = spark.readStream \
         .option("port", 9999) \
         .load()
 
+# split lines into words
+words = lines.select(
+    explode(
+        split(lines.value, " ")
+    ).alias("word")
+)
+
 clean_sentences = lines \
-	.withColumn("is_clean", clean_udf(col("value"))) \
-	.filter(col("is_clean") == True) \
+	.withColumn("is_clean", clean_udf(words)) \
+	.filter(bool(col("is_clean"))) \
 	.select("value")
 
 # write clean sentence to console
@@ -65,3 +72,4 @@ query = clean_sentences.writeStream \
     .start()
 
 query.awaitTermination()
+
