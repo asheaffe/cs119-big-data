@@ -61,8 +61,8 @@ words = lines.select(
 )
 
 clean_sentences = lines \
-	.withColumn("is_clean", clean_udf(words)) \
-	.filter(bool(col("is_clean"))) \
+	.withColumn("is_clean", clean_udf(col("value"))) \
+	.filter(col("is_clean") == True) \
 	.select("value")
 
 # write clean sentence to console
