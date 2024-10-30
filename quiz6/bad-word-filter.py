@@ -1,7 +1,7 @@
 from pyspark import SparkContext
 from pyspark.sql import SparkSession
 from bloom_filter import BloomFilter
-from pyspark.sql.functions import col, udf, explode
+from pyspark.sql.functions import *
 from pyspark.sql.types import BooleanType
 
 # read in the bad words from file
