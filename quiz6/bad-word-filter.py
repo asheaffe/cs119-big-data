@@ -42,7 +42,7 @@ def clean_sentence(sentence):
 
     # returns clean version of sentence
     words = sentence.split()
-    return all(word not in blm for word in words)
+    return all(not bloom_filter.contains(word) for word in words)
 
 clean_udf = udf(clean_sentence, BooleanType())
 
