@@ -50,7 +50,7 @@ clean_udf = udf(clean_sentence, BooleanType())
 lines = spark.readStream \
         .format("socket") \
         .option("host", "localhost") \
-        .option("port", 9999) \
+        .option("port", 10000) \
         .load()
 
 # split lines into words
