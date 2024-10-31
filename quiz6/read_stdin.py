@@ -37,16 +37,16 @@ counts = []
 
 start_time = time.time()
 
-for line in std.stdin:
+for line in sys.stdin:
     user_id = line.strip()
     hll.add(user_id)
 
     elapsed_time = time.time() - start_time
     if int(elapsed_time) > len(timestamps):
         timestamps.append(elapsed_time)
-        estimated_counts.append(hll.estimate())
+        counts.append(hll.estimate())
         print(f"Time elapsed: {elapsed_time}s, Estimated unique users: {estimated_counts[-1]}")
 
-while True:
-    line = sys.stdin.readline()
-    print(f"{line.strip()}")
+# while True:
+#     line = sys.stdin.readline()
+#     print(f"{line.strip()}")
