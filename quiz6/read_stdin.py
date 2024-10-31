@@ -45,7 +45,7 @@ for line in sys.stdin:
     if int(elapsed_time) > len(timestamps):
         timestamps.append(elapsed_time)
         counts.append(hll.estimate())
-        print(f"Time elapsed: {elapsed_time}s, Estimated unique users: {estimated_counts[-1]}")
+        print(f"Time elapsed: {elapsed_time}s, Estimated unique users: {counts[-1]}")
 
 # while True:
 #     line = sys.stdin.readline()
