@@ -1,6 +1,8 @@
 from pyspark import SparkContext
 from pyspark.sql import SparkSession
 from bloom_filter import BloomFilter
+from pyspark.sql.functions import *
+from pyspark.sql.types import BooleanType
 
 # read in the bad words from file
 f = open('afinn.txt', "r")
@@ -36,19 +38,32 @@ broadcast = sc.broadcast(bloom_filter)
 
 # method for piping sentences and checking if it is clean
 def clean_sentence(sentence):
+    blm = broadcast.value
+
     # returns clean version of sentence
     words = sentence.split()
-    return all(word not in bloom_filter for word in words)
+    return all(not bloom_filter.contains(word) for word in words)
+
+clean_udf = udf(clean_sentence, BooleanType())
 
 # dataframe that reads from the socket stream
 lines = spark.readStream \
         .format("socket") \
         .option("host", "localhost") \
-        .option("port", 9999) \
+        .option("port", 10000) \
         .load()
 
-clean_sentences = lines.rdd.map(lambda row: row.value) \
-    .filter(clean_sentence)
+# split lines into words
+words = lines.select(
+    explode(
+        split(lines.value, " ")
+    ).alias("word")
+)
+
+clean_sentences = lines \
+	.withColumn("is_clean", clean_udf(col("value"))) \
+	.filter(col("is_clean") == True) \
+	.select("value")
 
 # write clean sentence to console
 query = clean_sentences.writeStream \
@@ -57,3 +72,4 @@ query = clean_sentences.writeStream \
     .start()
 
 query.awaitTermination()
+
