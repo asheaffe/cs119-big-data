@@ -5,10 +5,10 @@ import os
 import sys
 
 from click_gen import *
-max_evs = 100000000000         # Total number of events that will be generated. 
+max_evs = 10         # Total number of events that will be generated. 
                        # If you want to make it run forever, set this number to like a million
 
-n_senders = 30          # Number of senders
+n_senders = 100          # Number of senders
 n_queries = 60         # How many different queries (or messages) a sender can send
 
 dispatcher = Dispatcher()
