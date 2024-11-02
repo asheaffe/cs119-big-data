@@ -40,7 +40,6 @@ start_time = time.time()
 for line in sys.stdin:
     user_id = line.split(" ")
     user_id = user_id[4]
-    print("user_id: ", user_id)
     hll.add(user_id)
 
     # continuously print estimates
