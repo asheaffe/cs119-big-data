@@ -1,0 +1,1 @@
+twelveDataKey = '3b4b69c00515493988220f9d44d78ab4'
