@@ -14,7 +14,7 @@ end_date=datetime.now()
 start_date=datetime(2020, 1, 1)
 
 tech_df = td.time_series(
-    symbol="GOOG,MSFT",
+    symbol="AAPL,MSFT",
     interval="1day",
     # start: Jan 1, 2020
     # the line tech_df = fdr.DataReader('GOOG, MSFT', '2020')
