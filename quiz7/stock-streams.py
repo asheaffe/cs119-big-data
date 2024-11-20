@@ -27,14 +27,13 @@ lines = spark \
 
 # parsing incoming data
 data = lines.select(
-    split(col("value"), "\s+").getItem(0).alias(("symbol"),
+    split(col("value"), "\s+").getItem(0).alias("symbol"),
             to_timestamp(split(col("value"), "\s+").getItem(1)).alias("datetime"),
             split(col("value"), "\s+").getItem(2).cast("double").alias("open"),
             split(col("value"), "\s+").getItem(2).cast("double").alias("high"),
             split(col("value"), "\s+").getItem(2).cast("double").alias("low"),
             split(col("value"), "\s+").getItem(2).cast("double").alias("close"),
             split(col("value"), "\s+").getItem(2).cast("double").alias("volume")
-            )
 )  
 
 # separate streams for AAPL and MSFT
@@ -48,8 +47,10 @@ write_aapl = aaplPrice \
     .format("console") \
     .start()
 
-write_msft = msftPrice \
-    .writeStream \
-    .outputMode("append") \
-    .format("console") \
-    .start()
+# write_msft = msftPrice \
+#     .writeStream \
+#     .outputMode("append") \
+#     .format("console") \
+#     .start()
+
+spark.streams.awaitAnyTermination()
