@@ -10,40 +10,37 @@ from twelvedata import TDClient
 # initialize the client
 td = TDClient(apikey=api_key)
 
+stocks = ['AAPL', 'MSFT']
 end_date=datetime.now()
 start_date=datetime(2020, 1, 1)
+interval = "15min"
 
-tech_df = td.time_series(
-    symbol="AAPL,MSFT",
-    interval="1day",
-    # start: Jan 1, 2020
-    # the line tech_df = fdr.DataReader('GOOG, MSFT', '2020')
-    start_date=start_date.strftime('%Y-%m-%d'),
-    end_date=end_date.strftime('%Y-%m-%d'),
-    outputsize=1000
-).as_pandas()
+for stock in stocks:
+    # send requests in chunks
+    current_date = start_date
 
-dates = tech_df.index
+    while current_date < end_date:
+        tech_df = td.time_series(
+            symbol="AAPL,MSFT",
+            interval=interval,
+            # start: Jan 1, 2020
+            # the line tech_df = fdr.DataReader('GOOG, MSFT', '2020')
+            start_date=start_date.strftime('%Y-%m-%d'),
+            end_date=(current_date + timedelta(days=30)).strftime('%Y-%m-%d'),
+            outputsize=100
+        ).as_pandas()
 
-init_date = dates[0][1]
-last_hist_date = dates[-1][1]
+        for stock, date in tech_df.index:
+            stock_data = tech_df.loc[stock, date]
 
-init_delay_seconds = 30
-interval = 5
+            # print each value separated by a tab
+            print(f"{stock}\t{date}\t{stock_data['open']}\t{stock_data['high']}\t{stock_data['low']}\t{stock_data['close']}\t{stock_data['volume']}")
 
-sys.stdout.reconfigure(encoding='utf-8')
-sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
+            # time delay after each print 
+            time.sleep(2.5)
+        
+        # move to next 30-day period
+        current_date += timedelta(days=30)
 
-print ('Sending daily GOOG and MSFT prices from %10s to %10s ...' % (str(init_date)[:10], str(last_hist_date)[:10]), flush=True, file=sys.stderr)
-print ("... each day's data sent every %d seconds ..." % (interval), flush=True, file=sys.stderr)
-print ('... beginning in %02d seconds ...' % (init_delay_seconds), flush=True, file=sys.stderr)
-print ("... MSFT prices adjusted to match GOOG prices on %10s ..."  % (str(init_date)), flush=True, file=sys.stderr)
-
-# show progress
-for left in tqdm(range(init_delay_seconds)):
-    time.sleep(0.5)
-
-# print data
-for stock, date in tech_df.index:
-    stock_data = tech_df.loc[stock, date]
-    print(stock_data)
+        # add a delay period
+        #time.sleep(30)
